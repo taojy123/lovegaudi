@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <style>
+    .waterfall {
+      /*max-width: 600px;*/
+      margin: 0 auto; 
+    }
+    .waterfall img {
+      position: absolute;
+      width: 200px;
+	  margin: 2px;
+      /* 布局transition效果 */
+      transition: all .4s;
+    }
+  </style>
+  <title>瀑布流</title>
+</head>
+<body>
+  <div class="waterfall">
+	<!-- <img src="http://via.placeholder.com/100x100" alt="100*100">
+	<img src="http://via.placeholder.com/100x70" alt="100*70"> -->
+
+	{{range .bricks}}
+		<img src="{{.Url}}" class="brick">
+	{{end}}
+
+  </div>
+</body>
+</html>
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.js"></script>
+<script>
+
+  var colCount   //定义列数
+  var colHeightArry= []   //定义列高度数组
+  var imgWidth = $('.waterfall img').outerWidth(true)   //单张图片的宽度
+
+  colCount = parseInt($('.waterfall').width()/imgWidth)   //计算出列数
+  for(var i = 0 ; i < colCount; i ++){
+    colHeightArry[i] = 0
+  }
+  //[0,0,0]
+
+  $('.waterfall img').on('load',function(){
+  
+    var minValue = colHeightArry[0]  //定义最小的高度
+    var minIndex = 0  //定义最小高度的下标
+    for(var i = 0 ; i < colCount; i ++){
+      if(colHeightArry[i] < minValue){   //如果最小高度组数中的值小于最小值
+        minValue = colHeightArry[i]   //那么认为最小高度数组中的值是真正的最小值
+        minIndex = i  //最小下标为当前下标
+      }
+    }
+
+    $(this).css({
+      left: minIndex * imgWidth,
+      top: minValue
+    })
+    colHeightArry[minIndex] += $(this).outerHeight(true)
+  })
+
+
+  //当窗口大小重置之后，重新执行
+  $(window).on('resize',function(){
+    reset()
+  })
+
+
+  //当窗口加载完毕，执行瀑布流
+  $(window).on('load',function(){
+    reset()
+  })
+
+  //定义reset函数
+  function reset(){
+	var colHeightArry= []
+    colCount = parseInt($('.waterfall').width()/imgWidth)
+    for(var i = 0 ; i < colCount; i ++){
+      colHeightArry[i] = 0
+    }
+    $('.waterfall img').each(function(){
+      var minValue = colHeightArry[0]
+      var minIndex = 0
+      for(var i = 0 ; i < colCount; i ++){
+        if(colHeightArry[i] < minValue){
+          minValue = colHeightArry[i]
+          minIndex = i
+        }
+      }
+
+      $(this).css({
+        left: minIndex * imgWidth,
+        top: minValue
+      })
+      colHeightArry[minIndex] += $(this).outerHeight(true)
+    })
+  }
+
+
+</script>
