@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/middleware/logger"
 	"github.com/kataras/iris/middleware/recover"
@@ -18,7 +19,7 @@ type Brick struct {
 	Comment string `json:"comment"`
 }
 
-func HandleErr(err error, title string)  {
+func HandleErr(err error, title string) {
 	if err != nil {
 		if title == "" {
 			title = "Error"
@@ -35,14 +36,12 @@ func LoadBrick(s []byte) Brick {
 	return brick
 }
 
-
 func DumpBrick(brick Brick) []byte {
 	s, err := json.Marshal(brick)
 	HandleErr(err, "Marshal Error")
 	//fmt.Println(string(s))
 	return s
 }
-
 
 func GetBricks() []Brick {
 	var bricks []Brick
@@ -62,7 +61,6 @@ func GetBricks() []Brick {
 	HandleErr(err, "")
 	return bricks
 }
-
 
 func SaveBricks(bricks []Brick) {
 
@@ -86,7 +84,6 @@ func SaveBricks(bricks []Brick) {
 	HandleErr(err, "")
 }
 
-
 func ClearBricks() {
 	db, err := bolt.Open(DB_NAME, 0666, nil)
 	HandleErr(err, "DB Contection Error")
@@ -105,7 +102,6 @@ func ClearBricks() {
 	HandleErr(err, "")
 }
 
-
 func ShuffleBricks(bs []Brick) []Brick {
 	rand.Seed(time.Now().UnixNano())
 	var i, j int
@@ -120,11 +116,8 @@ func ShuffleBricks(bs []Brick) []Brick {
 	return bs
 }
 
-
-
 var DB_NAME = "data.db"
 var BUCKET_NAME = []byte("bricks")
-
 
 func main() {
 
@@ -149,10 +142,10 @@ func main() {
 	app.Post("/upload_brick", uploadBrick)
 	app.Post("/delete_brick", deleteBrick)
 	app.Get("/clear", clear)
+	app.Get("/fetch", fetch)
 
 	app.Run(iris.Addr(":8080"), iris.WithoutServerError(iris.ErrServerClosed))
 }
-
 
 func index(ctx iris.Context) {
 
@@ -162,7 +155,6 @@ func index(ctx iris.Context) {
 	ctx.ViewData("bricks", bricks)
 	ctx.View("index.html")
 }
-
 
 func uploadBrick(ctx iris.Context) {
 
@@ -182,7 +174,6 @@ func uploadBrick(ctx iris.Context) {
 	ctx.Redirect("/")
 }
 
-
 func deleteBrick(ctx iris.Context) {
 
 	url := ctx.FormValue("url")
@@ -199,10 +190,29 @@ func deleteBrick(ctx iris.Context) {
 	ctx.JSON(iris.Map{"status": "deleted"})
 }
 
-
 func clear(ctx iris.Context) {
 	ClearBricks()
 	ctx.JSON(iris.Map{"status": "clear"})
 }
 
+func fetch(ctx iris.Context) {
 
+	bricks := GetBricks()
+
+	doc, err := goquery.NewDocument("https://www.google.com/search?q=gaudi&asearch=ichunk&async=_id:rg_s,_fmt:html")
+	fmt.Println(err)
+
+	doc.Find("img").Each(func(i int, s *goquery.Selection) {
+		// For each item found, get the band and title
+		src, found := s.Attr("src")
+		if !found {
+			src, _ = s.Attr("data-src")
+		}
+		fmt.Println(src)
+		brick := Brick{Url: src}
+		bricks = append(bricks, brick)
+	})
+
+	SaveBricks(bricks)
+	ctx.Redirect("/")
+}
