@@ -12,12 +12,12 @@
     .waterfall img {
       position: absolute;
       width: 200px;
-	  margin: 2px;
+	  margin: 4px;
       /* 布局transition效果 */
       transition: all .4s;
     }
   </style>
-  <title>瀑布流</title>
+  <title>Love Gaudi</title>
 </head>
 <body>
   <div class="waterfall">
@@ -29,6 +29,13 @@
 	{{end}}
 
   </div>
+
+    <div style="position: fixed; bottom: 20px">
+        <form action="/upload_brick" method="post">
+            <input type="text" name="url" placeholder="我也来加图（填写图片地址）" style="width: 300px">
+            <input type="submit" value="提交">
+        </form>
+    </div>
 </body>
 </html>
 <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.js"></script>
@@ -98,6 +105,24 @@
       colHeightArry[minIndex] += $(this).outerHeight(true)
     })
   }
+
+  $(".brick").dblclick(function () {
+      if (!confirm("要删除此图片吗?")) {
+          return
+      }
+      $brick = $(this)
+      $.ajax({
+          type: "post",
+          url: "/delete_brick",
+          data: {
+              url: $brick.attr('src')
+          },
+          success: function (res) {
+              $brick.remove()
+          }
+      })
+
+  })
 
 
 </script>
