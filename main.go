@@ -234,7 +234,7 @@ func fetch(ctx iris.Context) {
 	if n == "" {
 		n = strconv.Itoa(rand.Intn(500))
 	}
-	url := "https://cn.bing.com/images/async?q=gaudi&ensearch=1&mmasync=1&count=50&first=100"
+	url := "https://cn.bing.com/images/async?q=gaudi&ensearch=1&mmasync=1&count=50&first=" + n
 
 	fmt.Println(url)
 

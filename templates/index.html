@@ -123,7 +123,7 @@
     })
   }
 
-  $(".brick").dblclick(function () {
+  $(".brick").contextmenu(function () {
       if (!confirm("要删除此图片吗?")) {
           return
       }
@@ -136,6 +136,7 @@
           },
           success: function (res) {
               $brick.remove()
+              top.location.reload()
           }
       })
   })
