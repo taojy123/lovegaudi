@@ -132,7 +132,7 @@
           type: "post",
           url: "/delete_brick",
           data: {
-              url: $brick.attr('src')
+              url: $brick.attr('data-src')
           },
           success: function (res) {
               $brick.remove()
