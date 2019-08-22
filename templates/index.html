@@ -5,16 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <style>
-    .waterfall {
-      /*max-width: 600px;*/
-      margin: 0 auto; 
-    }
+      body {
+          margin: 0;
+      }
+      .waterfall{
+          width: 100%;
+      }
     .waterfall img {
       position: absolute;
       width: 200px;
 	  margin: 4px;
       /* 布局transition效果 */
       transition: all .4s;
+    }
+
+    @media (max-width: 600px) {
+        .waterfall img {
+            width: calc(50vw - 5px);  /* > margin*2 */
+            margin: 2px;
+        }
     }
   </style>
   <title>Love Gaudi</title>
@@ -25,14 +34,16 @@
 	<img src="http://via.placeholder.com/100x70" alt="100*70"> -->
 
 	{{range .bricks}}
-		<img src="{{.Url}}" class="brick">
+        <a href="{{.Url}}" target="_blank">
+            <img src="{{.Thumbnail}}" data-url="{{.Url}}" class="brick">
+        </a>
 	{{end}}
 
   </div>
 
-    <div style="position: fixed; bottom: 20px">
+    <div style="position: fixed; bottom: 20px; left: 10px">
         <form action="/upload_brick" method="post">
-            <input type="text" name="url" placeholder="我也来加图（填写图片地址）" style="width: 300px">
+            <input type="text" name="url" placeholder="加块砖（填写图片地址）" style="width: 250px">
             <input type="submit" value="提交">
         </form>
     </div>
@@ -45,11 +56,17 @@
   var colHeightArry= []   //定义列高度数组
   var imgWidth = $('.waterfall img').outerWidth(true)   //单张图片的宽度
 
+
   colCount = parseInt($('.waterfall').width()/imgWidth)   //计算出列数
   for(var i = 0 ; i < colCount; i ++){
     colHeightArry[i] = 0
   }
   //[0,0,0]
+
+  console.log($('.waterfall').width())
+  console.log(imgWidth)
+  console.log(colCount)
+
 
   $('.waterfall img').on('load',function(){
   
@@ -121,7 +138,6 @@
               $brick.remove()
           }
       })
-
   })
 
 

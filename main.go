@@ -3,12 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/middleware/logger"
 	"github.com/kataras/iris/middleware/recover"
 	bolt "go.etcd.io/bbolt"
+	"io/ioutil"
 	"math/rand"
+	"net/http"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -17,6 +20,13 @@ type Brick struct {
 	Url     string `json:"url"`
 	Likes   int    `json:"likes"`
 	Comment string `json:"comment"`
+}
+
+func (b Brick) Thumbnail() string {
+	if !strings.HasPrefix(b.Url, "https://tse") {
+		return b.Url
+	}
+	return b.Url + "&w=200"
 }
 
 func HandleErr(err error, title string) {
@@ -199,19 +209,55 @@ func fetch(ctx iris.Context) {
 
 	bricks := GetBricks()
 
-	doc, err := goquery.NewDocument("https://www.google.com/search?q=gaudi&asearch=ichunk&async=_id:rg_s,_fmt:html")
-	fmt.Println(err)
+	//res, err := http.Get("https://www.google.com/search?q=gaudi&asearch=ichunk&async=_id:rg_s,_fmt:html")
+	//HandleErr(err, "")
+	//defer res.Body.Close()
+	//
+	//// Load the HTML document
+	//doc, err := goquery.NewDocumentFromReader(res.Body)
+	//fmt.Println(err)
+	//
+	//doc.Find("img").Each(func(i int, s *goquery.Selection) {
+	//	// For each item found, get the band and title
+	//	src, found := s.Attr("src")
+	//	if !found {
+	//		src, _ = s.Attr("data-src")
+	//	}
+	//	fmt.Println(src)
+	//	brick := Brick{Url: src}
+	//	bricks = append(bricks, brick)
+	//})
 
-	doc.Find("img").Each(func(i int, s *goquery.Selection) {
-		// For each item found, get the band and title
-		src, found := s.Attr("src")
-		if !found {
-			src, _ = s.Attr("data-src")
-		}
-		fmt.Println(src)
-		brick := Brick{Url: src}
+	// https://cn.bing.com/images/async?q=gaudi&ensearch=1&mmasync=1&count=50&first=50
+
+	n := ctx.URLParam("n")
+	if n == "" {
+		n = strconv.Itoa(rand.Intn(500))
+	}
+	url := "https://cn.bing.com/images/async?q=gaudi&ensearch=1&mmasync=1&count=50&first=100"
+
+	fmt.Println(url)
+
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("cache-control", "no-cache")
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+	content := string(body)
+
+	//fmt.Println(res)
+	fmt.Println(content)
+
+	//exp2 := regexp.MustCompile(`src="(.*?)&`)
+	exp2 := regexp.MustCompile(`&quot;(https://tse\d.mm.bing.net/th\?id=.+?)&`)
+	rs := exp2.FindAllStringSubmatch(content, -1)
+
+	for _, v := range rs {
+		fmt.Println(v[0], v[1])
+		brick := Brick{Url: v[1]}
 		bricks = append(bricks, brick)
-	})
+	}
 
 	SaveBricks(bricks)
 	ctx.Redirect("/")
