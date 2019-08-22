@@ -34,7 +34,7 @@
 	<img src="http://via.placeholder.com/100x70" alt="100*70"> -->
 
 	{{range .bricks}}
-        <a href="{{.Url}}" target="_blank">
+        <a href="{{.Url}}">
             <img src="{{.Thumbnail}}" data-url="{{.Url}}" class="brick">
         </a>
 	{{end}}
@@ -43,7 +43,7 @@
 
     <div style="position: fixed; bottom: 20px; left: 10px">
         <form action="/upload_brick" method="post">
-            <input type="text" name="url" placeholder="加块砖（填写图片地址）" style="width: 250px">
+            <input type="text" name="url" placeholder="加块砖（填写图片地址）" style="width: 200px">
             <input type="submit" value="提交">
         </form>
     </div>
