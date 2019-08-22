@@ -229,17 +229,19 @@ func fetch(ctx iris.Context) {
 	//})
 
 	// https://cn.bing.com/images/async?q=gaudi&ensearch=1&mmasync=1&count=50&first=50
+	// 模拟采集与浏览器访问的结果有所不同，不明原因
 
 	n := ctx.URLParam("n")
 	if n == "" {
 		n = strconv.Itoa(rand.Intn(500))
 	}
 	url := "https://cn.bing.com/images/async?q=gaudi&ensearch=1&mmasync=1&count=50&first=" + n
+	//url = "http://127.0.0.1:8000"
 
 	fmt.Println(url)
 
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Add("cache-control", "no-cache")
+	req.Header.Add("user-agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1")
 	res, _ := http.DefaultClient.Do(req)
 
 	defer res.Body.Close()
@@ -249,8 +251,9 @@ func fetch(ctx iris.Context) {
 	//fmt.Println(res)
 	fmt.Println(content)
 
-	//exp2 := regexp.MustCompile(`src="(.*?)&`)
-	exp2 := regexp.MustCompile(`&quot;(https://tse\d.mm.bing.net/th\?id=.+?)&`)
+	//exp2 := regexp.MustCompile(`src="(https://tse.*?)&`)
+	//exp2 := regexp.MustCompile(`&quot;(https://tse\d.mm.bing.net/th\?id=.+?)&`)
+	exp2 := regexp.MustCompile(`(https://tse\d.mm.bing.net/th\?id=.+?)&`)
 	rs := exp2.FindAllStringSubmatch(content, -1)
 
 	for _, v := range rs {
