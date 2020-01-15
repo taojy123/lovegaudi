@@ -20,3 +20,7 @@ cd lovegaudi
 go run main.go
 ```
 
+## 进入项目目录直接运行
+```
+访问 `http://127.0.0.1:8080/fetch` 获取图片
+```

@@ -251,10 +251,17 @@ func fetch(ctx iris.Context) {
 	//fmt.Println(res)
 	fmt.Println(content)
 
-	//exp2 := regexp.MustCompile(`src="(https://tse.*?)&`)
-	//exp2 := regexp.MustCompile(`&quot;(https://tse\d.mm.bing.net/th\?id=.+?)&`)
-	exp2 := regexp.MustCompile(`(https://tse\d.mm.bing.net/th\?id=.+?)&`)
-	rs := exp2.FindAllStringSubmatch(content, -1)
+
+	//exp := regexp.MustCompile(`src="(https://tse.*?)&`)
+	//exp := regexp.MustCompile(`&quot;(https://tse\d.mm.bing.net/th\?id=.+?)&`)
+	exp1 := regexp.MustCompile(`(https://tse\d.mm.bing.net/th\?id=.+?)&`)
+	rs1 := exp1.FindAllStringSubmatch(content, -1)
+
+	// https://tse2-mm.cn.bing.net/th?id=OIP.N15LIiY_GkNFa5ZitU5dDwHaFj
+	exp2 := regexp.MustCompile(`(https://tse\d\-mm\.cn.bing.net/th\?id=.+?)&`)
+	rs2 := exp2.FindAllStringSubmatch(content, -1)
+
+	rs := append(rs1, rs2...)
 
 	for _, v := range rs {
 		fmt.Println(v[0], v[1])
