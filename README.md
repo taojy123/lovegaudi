@@ -2,7 +2,8 @@
 
 ## 先安装最新版本的 go
 ```
-add-apt-repository ppa:longsleep/golang-backports apt-get update
+add-apt-repository ppa:longsleep/golang-backports
+apt-get update
 apt-get install golang-go
 ```
 
