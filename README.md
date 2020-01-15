@@ -9,7 +9,7 @@ apt-get install golang-go
 ## 配置 goproxy
 ```
 export GO111MODULE=on
-export GOPROXY=https://goproxy.io
+export GOPROXY=https://goproxy.cn
 ```
 
 ## 进入项目目录直接运行
